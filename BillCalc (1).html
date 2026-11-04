@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>BillCalc</title>
+<style>
+:root{--bg:#ffffff;--card:#f1f2f5;--ink:#15171f;--mute:#6b7080;--pri:#2f5bea;--onpri:#fff;--bar:#e6ecff;--line:#d5d8e0;--red:#e5484d;--grn:#2e9e50;
+color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12141c;--card:#232634;--ink:#eceef7;--mute:#9aa0b8;--pri:#8ea4e6;--onpri:#12141c;--bar:#222a4a;--line:#3a3f55;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#12141c;--card:#232634;--ink:#eceef7;--mute:#9aa0b8;--pri:#8ea4e6;--onpri:#12141c;--bar:#222a4a;--line:#3a3f55;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{height:100dvh}
+body{background:var(--bg);color:var(--ink);font:15px/1.35 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;max-width:960px;margin:0 auto;display:flex;flex-direction:column}
+header{padding:12px 16px;font-weight:700;font-size:20px;border-bottom:1px solid var(--card)}
+main{flex:1;min-height:0;overflow-y:auto;padding:10px 12px}
+.view{display:none}.view.on{display:block}
+#v-calc.on{display:flex;flex-direction:column;height:100%}
+button{font:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:2px solid var(--pri);outline-offset:1px}
+input.t{width:100%;border:0;background:var(--card);color:var(--ink);border-radius:12px;padding:10px 12px;font:inherit}
+.btn{border:0;background:var(--pri);color:var(--onpri);border-radius:12px;padding:10px 14px;font-weight:600}
+.btn.s{background:var(--card);color:var(--ink)}.btn.r{background:var(--red);color:#fff}
+table{width:100%;border-collapse:collapse;table-layout:fixed}
+th:nth-child(1),td:nth-child(1){width:40%}th:nth-child(2),td:nth-child(2){width:16%}th:nth-child(3),td:nth-child(3),th:nth-child(4),td:nth-child(4){width:22%}
+td:first-child{overflow-wrap:anywhere}
+.tbl{background:var(--card);border-radius:12px;overflow:hidden;margin-top:8px;flex:none}
+.tbl .sc{max-height:150px;overflow-y:auto}
+th{background:var(--bar);color:var(--pri);font-size:12px;text-align:left;padding:6px 10px}
+td{padding:6px 10px;border-top:1px solid var(--line)}
+th:nth-child(n+2),td:nth-child(n+2){text-align:right}
+.none{padding:18px;text-align:center;color:var(--mute)}
+.totrow{display:grid;grid-template-columns:40% 16% 22% 22%;background:var(--bar);padding:8px 0;font-weight:700}
+.totrow span{padding:0 10px}.totrow span:nth-child(n+2){text-align:right}
+.acts{display:flex;gap:8px;margin:8px 0;flex:none}.acts .btn{flex:1;padding:10px 6px}
+.tabs{display:flex;gap:6px;margin-bottom:8px;flex:none}
+.tabs button{border:0;background:var(--card);color:var(--mute);border-radius:16px;padding:6px 14px}
+.tabs button.on{background:var(--pri);color:var(--onpri)}
+.grid{flex:1;min-height:0;overflow-y:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;align-content:start}
+.tile{background:var(--card);border-radius:12px;padding:8px 10px}
+.tile b{display:block;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tile .rt{color:var(--mute);font-size:13px}
+.st{display:flex;align-items:center;justify-content:space-between;margin-top:6px}
+.st button{width:36px;height:32px;border:0;border-radius:8px;color:#fff;font-size:20px;line-height:1}
+.st .m{background:var(--red)}.st .p{background:var(--grn)}.qi{flex:1;width:0;min-width:0;margin:0 6px;height:32px;text-align:center;border:0;background:var(--bg);color:var(--ink);border-radius:8px;font:inherit;font-weight:700;font-size:17px}
+.tile.has{outline:2px solid var(--pri)}
+nav{display:flex;border-top:1px solid var(--card);padding:6px 4px}
+nav button{flex:1;background:none;border:0;color:var(--mute);padding:8px 2px;font-size:13px}
+nav button.on{color:var(--pri);font-weight:700}
+h2{font-size:18px;margin:4px 0 10px}
+.row{display:flex;gap:8px;margin-bottom:10px}.row input{flex:1;min-width:0}
+.list{list-style:none;margin:0;padding:0}
+.list li{display:flex;align-items:center;gap:10px;background:var(--card);border-radius:12px;padding:10px 12px;margin-bottom:8px}
+.list .n{flex:1}.list .n small{display:block;color:var(--mute)}
+.ib{background:none;border:0;font-size:22px;color:var(--mute)}.ib.on{color:var(--pri)}
+.sum{display:flex;gap:10px;margin-bottom:12px}.sum div{flex:1;background:var(--bar);border-radius:12px;padding:10px}.sum b{display:block;font-size:22px}
+.empty{color:var(--mute);text-align:center;padding:24px 8px}
+.sd{color:var(--grn);font-weight:600}
+.sum div{min-width:0}
+.board{background:var(--card);border-radius:12px;padding:10px 12px;margin-bottom:12px}.board h3{margin:0 0 8px;font-size:15px}
+.bi{margin-bottom:8px}.bt{display:flex;justify-content:space-between;gap:8px}.bar{height:6px;background:var(--line);border-radius:3px;margin-top:3px}.bar i{display:block;height:100%;background:var(--pri);border-radius:3px}
+#modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;justify-content:center;z-index:9}
+#modal[hidden]{display:none}
+.sheet{background:var(--bg);width:100%;max-width:420px;max-height:92dvh;overflow-y:auto;border-radius:18px 18px 0 0;padding:14px;padding-bottom:calc(14px + env(safe-area-inset-bottom,0px))}
+.rc{width:58mm;max-width:100%;margin:0 auto 12px;background:#fff;color:#000;padding:3mm 2.5mm;font:11px/1.35 Arial,Helvetica,sans-serif;box-shadow:0 0 0 1px var(--line)}
+.rc.p80{width:80mm;font-size:13px;padding:4mm 3mm}
+.rc hr{border:0;border-top:1px solid #000;margin:5px 0}.rc .c{text-align:center}
+.rc .sn{font-size:1.45em;font-weight:700;text-align:center;line-height:1.15}.rc .ti{text-align:center;font-weight:700;font-size:1.15em}
+.rc .mt{display:grid;grid-template-columns:1fr 1fr;gap:1px 6px;margin:3px 0}
+.rc table{width:100%;border-collapse:collapse;table-layout:fixed}
+.rc th{background:none;color:#000;font-size:1em;padding:2px 0;border-top:1px solid #000;border-bottom:1px solid #000}
+.rc td{padding:1.5px 0;border:0;vertical-align:top}
+.rc th:nth-child(1),.rc td:nth-child(1){width:7%;text-align:left}.rc th:nth-child(2),.rc td:nth-child(2){width:37%;text-align:left}
+.rc th:nth-child(3),.rc td:nth-child(3){width:11%;text-align:center}.rc th:nth-child(4),.rc td:nth-child(4){width:21%;text-align:right}.rc th:nth-child(5),.rc td:nth-child(5){width:24%;text-align:right}
+.rc .l{display:flex;justify-content:space-between;gap:6px}.rc .l.r{margin-left:28%}.rc .gt{font-weight:700;font-size:1.3em}
+.rc .fo{margin:4px 0}.rc .bn{letter-spacing:2px}
+select.t{width:100%;border:0;background:var(--card);color:var(--ink);border-radius:12px;padding:10px 12px;font:inherit}
+#dwrap select{max-width:110px}#dwrap{flex-wrap:wrap}
+.mb2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+#dwrap{display:flex;align-items:center;gap:8px;margin-bottom:10px}#dwrap[hidden]{display:none}#dwrap input{max-width:120px}
+@media (min-width:720px){#modal{align-items:center}.sheet{border-radius:18px}#v-hist,#v-sales,#v-set{max-width:640px;margin:0 auto}}
+@media print{html,body{height:auto;background:#fff}body>*:not(#modal){display:none!important}#modal{position:static;background:none;display:block}.sheet{max-width:none;padding:0;max-height:none;overflow:visible;background:none}.rc,.rc.p80{box-shadow:none;margin:0;width:100%}#dtl,#dwrap,.mb2{display:none!important}}
+@media (min-width:720px){
+ main{padding:14px 20px}
+ #v-calc.on{display:grid;grid-template-columns:minmax(320px,2fr) 3fr;grid-template-rows:auto auto 1fr;column-gap:20px;align-content:start}
+ #search{grid-column:2;grid-row:1}.tbl{grid-column:1;grid-row:1/3;margin-top:0}.tbl .sc{max-height:55dvh}
+ .acts{grid-column:1;grid-row:3;align-self:start}.tabs{grid-column:2;grid-row:2;margin-top:8px}.grid{grid-column:2;grid-row:3}
+ .tile b{font-size:16px}
+}
+@media (max-height:560px){#v-calc.on{height:auto}.grid{overflow:visible;flex:none}.tbl .sc{max-height:110px}}
+@media (max-width:359px){.acts .btn{font-size:13px;padding:10px 2px}.st button{width:32px}}
+.sheet{overflow-x:hidden}#dwrap>*{min-width:0}#dwrap input.t,#dwrap select.t{width:auto}
+details#dtl{margin-bottom:10px}details#dtl[hidden]{display:none}summary{cursor:pointer;color:var(--pri);padding:6px 0;margin-bottom:6px}
+.mb2 .btn{min-width:0}.mb2 .wa{grid-column:1/-1;background:#25a244;color:#fff}.mb2 #mclose{grid-column:1/-1}
+#sov{position:fixed;inset:0;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;z-index:10;padding:12px}#sov[hidden]{display:none}
+#sov .box{background:var(--bg);border-radius:16px;padding:12px;max-height:92dvh;overflow:auto;text-align:center;max-width:420px}#simg{max-width:100%;border-radius:8px}
+</style>
+</head>
+<body>
+<header>BillCalc</header>
+<main>
+<section class="view on" id="v-calc">
+ <input class="t" id="search" placeholder="Search product" autocomplete="off">
+ <div class="tbl"><table><thead><tr><th>ITEM</th><th>QTY</th><th>RATE</th><th>TOTAL</th></tr></thead></table>
+  <div class="sc"><table id="rows"></table></div>
+  <div class="totrow"><span>TOTAL</span><span id="tq">0</span><span></span><span id="ta">₹0</span></div></div>
+ <div class="acts"><button class="btn r" id="clr">Clear</button><button class="btn s" id="addp">Add product</button><button class="btn" id="save">Show bill</button></div>
+ <div class="tabs" id="tabs"><button data-f="star" class="on">Starred</button><button data-f="all">All</button></div>
+ <div class="grid" id="grid"></div>
+</section>
+<section class="view" id="v-today"><h2>Today’s sales</h2>
+ <div class="sum"><div><span>Sales</span><b id="tAmt">0</b></div><div><span>Bills</span><b id="tBills">0</b></div><div><span>Items sold</span><b id="tItems">0</b></div></div>
+ <div class="board" id="tCmp"></div><div class="row"><button class="btn s" id="trep">Copy today’s report</button></div><div class="board" id="tPay"></div><div class="board" id="tTop"></div>
+ <h2>Today’s bills</h2><div id="tBillsList"></div></section>
+<section class="view" id="v-hist"><h2>History</h2><input class="t" id="hsearch" placeholder="Search bill no, customer or product" style="margin-bottom:10px"><div id="hist"></div></section>
+<section class="view" id="v-sales">
+ <h2>Daily sales</h2>
+ <div class="sum"><div><span>Today’s sales</span><b id="sTot">0.00</b></div><div><span>Bills</span><b id="sCnt">0</b></div><div><span>Items sold</span><b id="sItems">0</b></div></div>
+ <div class="board" id="board"></div>
+ <div class="row"><input class="t" id="pn" placeholder="Product name"><input class="t" id="pr" placeholder="Rate" inputmode="decimal" style="max-width:110px"></div>
+ <div class="row"><button class="btn" id="add">Save product</button></div>
+ <ul class="list" id="plistUI"></ul>
+</section>
+<section class="view" id="v-set"><h2>Settings</h2>
+ <div class="row"><input class="t" id="shopn" placeholder="Shop name"></div>
+ <div class="row"><input class="t" id="shopa" placeholder="Address"></div>
+ <div class="row"><input class="t" id="shopp" placeholder="Phone"><input class="t" id="shopc" placeholder="Cashier name"></div>
+ <div class="row"><input class="t" id="shopt" placeholder="Bill title (TAX INVOICE)"><input class="t" id="shopg" inputmode="decimal" placeholder="GST %" style="max-width:90px"></div>
+ <div class="row"><input class="t" id="shopf" placeholder="Footer message"></div>
+ <div class="row"><select class="t" id="shopw" aria-label="Paper size"><option value="58">Paper: 58mm printer</option><option value="80">Paper: 80mm printer</option></select></div>
+ <div class="row"><button class="btn" id="theme">Switch light / dark</button></div>
+ <div class="row"><button class="btn r" id="wipe">Delete all data</button></div>
+</section>
+</main>
+<nav id="nav"><button class="on" data-v="calc">Calc</button><button data-v="today">Today</button><button data-v="hist">History</button><button data-v="sales">Daily Sales</button><button data-v="set">Settings</button></nav>
+<div id="modal" hidden><div class="sheet"><div id="receipt" class="rc"></div>
+ <details id="dtl"><summary>Discount, payment, customer</summary><div id="dwrap"><input class="t" id="cust" placeholder="Customer name (optional)" style="max-width:none;flex:1 1 100%"><label for="disc">Discount ₹</label><input class="t" id="disc" inputmode="decimal" placeholder="0"><select class="t" id="pay" aria-label="Payment"><option>Cash</option><option>UPI</option><option>Card</option><option>Credit</option></select><input class="t" id="recv" inputmode="decimal" placeholder="Received ₹ (for change)" style="max-width:none;flex:1 1 100%"></div></details>
+ <div class="mb2"><button class="btn wa" id="mshare">Share on WhatsApp</button><button class="btn" id="msave">Save bill</button><button class="btn r" id="mdel" hidden>Delete bill</button><button class="btn s" id="mprint">Print</button><button class="btn s" id="mclose">Close</button></div></div></div>
+<div id="sov" hidden><div class="box"><img id="simg" alt="Bill"><p>Press and hold the image, then choose Share or Save and pick WhatsApp.</p><button class="btn" id="sclose">Done</button></div></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+var DEF="kings:219,Rice 1kg:60,Sugar 1kg:45,Wheat flour 1kg:40,Cooking oil 1L:140,Tea 250g:110,Milk 1L:70,Eggs dozen:90,Bread:35,Salt 1kg:20,Biscuits:10,Soap:35,Shampoo sachet:2,Detergent 1kg:95,Toothpaste:60,Noodles:15,Chips:20,Cold drink 500ml:40,Water bottle 1L:20,Butter 100g:58,Jam:120,Lentils 1kg:110,Chickpeas 1kg:95,Onion 1kg:30,Potato 1kg:25,Tomato 1kg:35,Spices pack:25,Coffee 50g:150,Matchbox:2,Candles pack:30".split(",").map(function(s,i){var p=s.split(":");return{n:p[0],r:+p[1],b:i<10}});
+var S={products:DEF,bills:[]};
+try{var raw=localStorage.getItem("billcalc2");if(raw)S=JSON.parse(raw)}catch(e){}
+S.shop=Object.assign({name:"My Shop",addr:"",phone:"",title:"TAX INVOICE",cashier:"",gst:"0",foot:"Thank You... Visit Again !",paper:"58"},S.shop||{});S.no=S.no||S.bills.length;
+function persist(){try{localStorage.setItem("billcalc2",JSON.stringify(S))}catch(e){}}
+var $=function(i){return document.getElementById(i)};
+var cnt={},flt="star";
+var pad2=function(n){return (n<10?"0":"")+n};var today=function(){var n=new Date();return n.getFullYear()+"-"+pad2(n.getMonth()+1)+"-"+pad2(n.getDate())};
+var fmt=function(x){return (+x).toFixed(2)};
+var money=function(x){return "₹"+(Math.round(x*100)/100)};
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function show(v){document.querySelectorAll(".view").forEach(function(e){e.classList.toggle("on",e.id==="v-"+v)});
+ document.querySelectorAll("#nav button").forEach(function(b){b.classList.toggle("on",b.dataset.v===v)});
+ if(v==="today")drawToday();if(v==="hist")drawHist();if(v==="sales")drawSales();}
+$("nav").onclick=function(e){if(e.target.dataset.v)show(e.target.dataset.v)};
+function lines(){return S.products.filter(function(p){return cnt[p.n]>0}).map(function(p){return{name:p.n,qty:cnt[p.n],rate:p.r,amt:cnt[p.n]*p.r}})}
+function drawBill(){
+ var L=lines(),tq=0,ta=0;L.forEach(function(l){tq+=l.qty;ta+=l.amt});
+ $("rows").innerHTML=L.length?L.map(function(l){return '<tr><td>'+esc(l.name)+'</td><td>'+l.qty+'</td><td>'+money(l.rate)+'</td><td>'+money(l.amt)+'</td></tr>'}).join(""):'<tr><td class="none" colspan="4" style="text-align:center">Tap + on a product to add it</td></tr>';
+ $("tq").textContent=tq;$("ta").textContent=money(ta);}
+function draw(){drawBill();
+ var sd=soldLive();var q=$("search").value.trim().toLowerCase();
+ var h="";S.products.map(function(p,i){return i}).reverse().forEach(function(i){var p=S.products[i];
+  if(q?p.n.toLowerCase().indexOf(q)<0:(flt==="star"&&!p.b))return;
+  var c=cnt[p.n]||0;
+  h+='<div class="tile'+(c?" has":"")+'"><b>'+esc(p.n)+'</b><div class="rt">'+money(p.r)+(sd[p.n]?' · <span class="sd">'+sd[p.n]+' sold today</span>':'')+'</div><div class="st"><button class="m" data-m="'+i+'" aria-label="Remove one">−</button><input class="qi" inputmode="decimal" placeholder="0" value="'+(c||"")+'" data-q="'+i+'" aria-label="Quantity"><button class="p" data-p="'+i+'" aria-label="Add one">+</button></div></div>'});
+ $("grid").innerHTML=h||'<div class="empty" style="grid-column:1/-1">No products here. Use Add product.</div>';
+ document.querySelectorAll("#tabs button").forEach(function(b){b.classList.toggle("on",b.dataset.f===flt)});}
+$("grid").onclick=function(e){var d=e.target.dataset,i=d.p!==undefined?+d.p:d.m!==undefined?+d.m:-1;if(i<0)return;
+ var n=S.products[i].n,c=cnt[n]||0;c+=d.p!==undefined?1:-1;if(c<=0)delete cnt[n];else cnt[n]=c;
+ var sy=$("grid").scrollTop;draw();$("grid").scrollTop=sy};
+$("grid").oninput=function(e){var i=e.target.dataset.q;if(i===undefined)return;var v=parseFloat(e.target.value),n=S.products[+i].n;
+ if(v>0)cnt[n]=v;else delete cnt[n];drawBill();e.target.closest(".tile").classList.toggle("has",v>0)};
+$("grid").onfocusin=function(e){if(e.target.dataset.q!==undefined)e.target.select()};
+$("tabs").onclick=function(e){if(e.target.dataset.f){flt=e.target.dataset.f;draw()}};
+$("search").oninput=draw;
+$("clr").onclick=function(){cnt={};draw()};
+$("addp").onclick=function(){show("sales");$("pn").focus()};
+$("save").onclick=function(){if(!lines().length)return;$("disc").value="";openRc(draftBill(),true)};
+$("disc").oninput=function(){cur=draftBill();$("receipt").innerHTML=rcHTML(cur)};
+$("mclose").onclick=function(){$("modal").hidden=true};
+$("modal").onclick=function(e){if(e.target.id==="modal")$("modal").hidden=true};
+$("mprint").onclick=function(){try{window.print()}catch(e){}};
+$("msave").onclick=function(){var b=draftBill();b.no=++S.no;S.bills.unshift(b);persist();cnt={};$("modal").hidden=true;draw();show("hist")};
+$("hist").onclick=function(e){var li=e.target.closest("li");if(!li)return;var b=S.bills[+li.dataset.h];if(b){b.sub=b.sub||b.total;openRc(b,false)}};
+var cur=null;
+function soldToday(){var m={};S.bills.forEach(function(b){if(b.d===today())b.items.forEach(function(i){m[i.name]=(m[i.name]||0)+i.qty})});return m}
+function soldLive(){var m=soldToday();Object.keys(cnt).forEach(function(k){m[k]=(m[k]||0)+cnt[k]});return m}
+function topArr(m){return Object.keys(m).map(function(k){return[k,m[k]]}).sort(function(a,b){return b[1]-a[1]})}
+function topBoard(m){var a=topArr(m),mx=a.length?a[0][1]:1,tot=a.reduce(function(s,x){return s+x[1]},0);$("sItems").textContent=tot;
+ $("board").innerHTML=a.length?'<h3>Most sold today</h3>'+a.slice(0,5).map(function(x,i){return '<div class="bi"><div class="bt"><span>'+(i+1)+'. '+esc(x[0])+'</span><b>'+x[1]+' sold</b></div><div class="bar"><i style="width:'+(x[1]/mx*100)+'%"></i></div></div>'}).join(""):'<div class="empty">Your most sold products today will show here.</div>'}
+function f2(x){return (Math.round(x*100)/100).toFixed(2)}
+function drawToday(){var amt=0,pay={},rows="",n=0;
+ S.bills.forEach(function(b,i){if(b.d!==today())return;n++;amt+=b.total;var k=b.pay||"Cash";pay[k]=(pay[k]||0)+b.total;
+  rows+='<li data-h="'+i+'" style="cursor:pointer"><div class="n">'+(b.no?'#'+b.no+' ':'')+esc(b.t||"")+'<small>'+b.items.map(function(x){return esc(x.name)+' ×'+x.qty}).join(", ")+'</small></div><b>'+money(b.total)+'</b></li>'});
+ var a=topArr(soldToday()),mx=a.length?a[0][1]:1,pk=Object.keys(pay);
+ $("tAmt").textContent=money(amt);cmp(amt,n);$("tBills").textContent=n;$("tItems").textContent=a.reduce(function(s,x){return s+x[1]},0);
+ $("tPay").innerHTML='<h3>Payment</h3>'+(pk.length?pk.map(function(k){return '<div class="bt"><span>'+esc(k)+'</span><b>'+money(pay[k])+'</b></div>'}).join(""):'<div style="color:var(--mute)">No payments yet today.</div>');
+ $("tTop").innerHTML='<h3>Most sold today</h3>'+(a.length?a.map(function(x,i){return '<div class="bi"><div class="bt"><span>'+(i+1)+'. '+esc(x[0])+'</span><b>'+x[1]+' sold</b></div><div class="bar"><i style="width:'+(x[1]/mx*100)+'%"></i></div></div>'}).join(""):'<div style="color:var(--mute)">Sold products will show here with bars.</div>');
+ $("tBillsList").innerHTML=n?'<ul class="list">'+rows+'</ul>':'<div class="empty">No bills saved today. Tap Calc to make one.</div>'}
+function hm(b){var q=($("hsearch").value||"").trim().toLowerCase();if(!q)return true;return (pad(b.no||0)+" "+(b.cust||"")+" "+b.d+" "+b.items.map(function(i){return i.name}).join(" ")).toLowerCase().indexOf(q)>-1}
+function ymd(off){var d=new Date();d.setDate(d.getDate()-off);return d.getFullYear()+"-"+pad2(d.getMonth()+1)+"-"+pad2(d.getDate())}
+function cmp(amt,n){var y=ymd(1),ya=0,t;S.bills.forEach(function(b){if(b.d===y)ya+=b.total});
+ if(ya>0){var p=Math.round((amt-ya)/ya*100);t=money(ya)+' ('+(p>=0?'up ':'down ')+Math.abs(p)+'%)'}else t='no sales';
+ $("tCmp").innerHTML='<div class="bt"><span>Average bill</span><b>'+money(n?amt/n:0)+'</b></div><div class="bt"><span>Yesterday</span><b>'+t+'</b></div>'}
+function showImg(u){$("simg").src=u;$("sov").hidden=false}
+function shareImg(){if(!window.html2canvas){alert("Image maker not loaded. Check your internet and try again.");return}
+ html2canvas($("receipt"),{backgroundColor:"#ffffff",scale:3}).then(function(c){c.toBlob(function(bl){
+  var f=new File([bl],"bill-"+pad(cur.no||0)+".png",{type:"image/png"});
+  if(navigator.canShare&&navigator.canShare({files:[f]})){navigator.share({files:[f],title:"Bill "+pad(cur.no||0)}).catch(function(){})}else showImg(c.toDataURL("image/png"))},"image/png")})}
+function pad(n){return String(n).padStart(6,"0")}
+function fd(s){var p=(s||"").split("-");if(p.length<3)return s||"";return p[2]+"-"+["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][+p[1]-1]+"-"+p[0]}
+function bars(txt){var P={"0":"nnnwwnwnn","1":"wnnwnnnnw","2":"nnwwnnnnw","3":"wnwwnnnnn","4":"nnnwwnnnw","5":"wnnwwnnnn","6":"nnwwwnnnn","7":"nnnwnnwnw","8":"wnnwnnwnn","9":"nnwwnnwnn","*":"nnnwnnwnn"},s="*"+txt+"*",x=0,r="";
+ for(var i=0;i<s.length;i++){var p=P[s.charAt(i)];for(var j=0;j<9;j++){var w=p.charAt(j)==="w"?3:1;if(j%2===0)r+='<rect x="'+x+'" y="0" width="'+w+'" height="40"/>';x+=w}x+=1}
+ return '<svg viewBox="0 0 '+x+' 40" preserveAspectRatio="none" style="width:90%;height:38px;display:block;margin:6px auto 2px" fill="#000">'+r+'</svg>'}
+function setPaper(){var p=S.shop.paper==="80"?"80":"58";$("receipt").className="rc"+(p==="80"?" p80":"");var st=$("pg");if(!st){st=document.createElement("style");st.id="pg";document.head.appendChild(st)}st.textContent="@media print{@page{size:"+p+"mm auto;margin:0}}"}
+function draftBill(){var L=lines(),sub=L.reduce(function(a,b){return a+b.amt},0),d=Math.min(parseFloat($("disc").value)||0,sub),g=parseFloat(S.shop.gst)||0,ga=Math.round((sub-d)*g)/100;
+ return{no:S.no+1,d:today(),t:new Date().toLocaleTimeString("en-US",{hour:"2-digit",minute:"2-digit"}),items:L,sub:sub,disc:d,gst:g,gstAmt:ga,total:sub-d+ga,pay:$("pay").value,cashier:S.shop.cashier||"",cust:$("cust").value.trim(),recv:parseFloat($("recv").value)||0}}
+function rcHTML(b){var sh=S.shop,sub=b.sub!=null?b.sub:b.total,Q=0;b.items.forEach(function(i){Q+=i.qty});
+ return '<div class="sn">'+esc(sh.name)+'</div>'+(sh.addr?'<div class="c">'+esc(sh.addr)+'</div>':'')+(sh.phone?'<div class="c">Ph: '+esc(sh.phone)+'</div>':'')+'<hr><div class="ti">'+esc(sh.title||"INVOICE")+'</div>'+
+ '<div class="mt"><span>Bill No : '+pad(b.no||0)+'</span><span>Date : '+fd(b.d)+'</span><span>Time : '+esc(b.t||"")+'</span><span>'+(b.cashier?'Cashier : '+esc(b.cashier):'')+'</span></div>'+
+ '<table><thead><tr><th>#</th><th>Product</th><th>Qty</th><th>Rate</th><th>Amount</th></tr></thead><tbody>'+b.items.map(function(i,k){return '<tr><td>'+(k+1)+'</td><td>'+esc(i.name)+'</td><td>'+i.qty+'</td><td>'+f2(i.rate)+'</td><td>'+f2(i.amt)+'</td></tr>'}).join("")+'</tbody></table><hr>'+
+ '<div class="l"><span>Items : '+b.items.length+'</span><span>Total Qty : '+Q+'</span></div>'+
+ '<div class="l r"><span>Sub Total :</span><span>'+f2(sub)+'</span></div><div class="l r"><span>Discount :</span><span>'+f2(b.disc||0)+'</span></div><div class="l r"><span>GST ('+(b.gst||0)+'%) :</span><span>'+f2(b.gstAmt||0)+'</span></div><hr>'+
+ '<div class="l gt"><span>Grand Total :</span><span>₹ '+f2(b.total)+'</span></div>'+(b.recv?'<div class="l"><span>Received :</span><span>'+f2(b.recv)+'</span></div><div class="l"><span>Change :</span><span>'+f2(Math.max(0,b.recv-b.total))+'</span></div>':'')+'<hr><div>Payment : '+esc(b.pay||"Cash")+(b.cust?' ('+esc(b.cust)+')':'')+'</div><div class="c fo">'+esc(sh.foot)+'</div>'+bars(pad(b.no||0))+'<div class="c bn">'+pad(b.no||0)+'</div>'}
+function rcText(b){var W=32,sh=S.shop,sub=b.sub!=null?b.sub:b.total,Q=0,ln=function(a,c){return a+" ".repeat(Math.max(1,W-a.length-c.length))+c},ct=function(s){return " ".repeat(Math.max(0,(W-s.length)>>1))+s},ds="-".repeat(W);b.items.forEach(function(i){Q+=i.qty});
+ var o=[ct(sh.name)];if(sh.addr)o.push(ct(sh.addr));if(sh.phone)o.push(ct("Ph: "+sh.phone));o.push(ds,ct(sh.title||"INVOICE"),ln("Bill No: "+pad(b.no||0),"Date: "+fd(b.d)),ln("Time: "+(b.t||""),b.cashier?"By: "+b.cashier:""),ds);
+ b.items.forEach(function(i,k){o.push((k+1)+". "+i.name);o.push(ln("   "+i.qty+" x "+f2(i.rate),f2(i.amt)))});
+ o.push(ds,ln("Items: "+b.items.length,"Total Qty: "+Q),ln("Sub Total",f2(sub)),ln("Discount",f2(b.disc||0)),ln("GST ("+(b.gst||0)+"%)",f2(b.gstAmt||0)),ds,ln("Grand Total","Rs "+f2(b.total)),ds);if(b.recv){o.push(ln("Received",f2(b.recv)),ln("Change",f2(Math.max(0,b.recv-b.total))))}o.push("Payment: "+(b.pay||"Cash")+(b.cust?" ("+b.cust+")":""),ct(sh.foot));return o.join("\n")}
+function openRc(b,isNew){cur=b;setPaper();$("receipt").innerHTML=rcHTML(b);$("dtl").hidden=!isNew;$("msave").hidden=!isNew;$("mdel").hidden=isNew;$("modal").hidden=false}
+function drawHist(){$("hist").innerHTML=S.bills.length?'<ul class="list">'+S.bills.map(function(b,i){if(!hm(b))return"";return '<li data-h="'+i+'" style="cursor:pointer"><div class="n">'+(b.no?'#'+b.no+' ':'')+(b.cust?esc(b.cust)+' · ':'')+fd(b.d)+' '+b.t+'<small>'+b.items.map(function(i){return esc(i.name)+' ×'+i.qty}).join(", ")+'</small></div><b>'+money(b.total)+'</b></li>'}).join("")+'</ul>':'<div class="empty">No saved bills yet. Add items on Calc and tap Save.</div>'}
+function drawSales(){var tb=S.bills.filter(function(b){return b.d===today()});
+ $("sTot").textContent=fmt(tb.reduce(function(a,b){return a+b.total},0));$("sCnt").textContent=tb.length;
+ var sold=soldToday();topBoard(sold);
+ $("plistUI").innerHTML=S.products.length?S.products.map(function(p,i){return '<li><button class="ib'+(p.b?" on":"")+'" data-b="'+i+'" aria-label="Bookmark">'+(p.b?"★":"☆")+'</button><div class="n">'+esc(p.n)+'<small>Rate '+fmt(p.r)+(sold[p.n]?' · sold today '+sold[p.n]:'')+'</small></div><button class="ib" data-d="'+i+'" aria-label="Delete">✕</button></li>'}).join(""):'<div class="empty">Add your first product and its rate.</div>';}
+$("plistUI").onclick=function(e){var b=e.target.dataset;if(b.b!==undefined)S.products[+b.b].b=!S.products[+b.b].b;else if(b.d!==undefined){delete cnt[S.products[+b.d].n];S.products.splice(+b.d,1)}else return;persist();drawSales();draw()};
+$("add").onclick=function(){var n=$("pn").value.trim(),v=parseFloat($("pr").value);if(!n||!v)return;
+ var ex=S.products.filter(function(p){return p.n.toLowerCase()===n.toLowerCase()})[0];
+ if(ex){ex.r=v}else S.products.push({n:n,r:v,b:true});
+ $("pn").value=$("pr").value="";persist();drawSales();draw()};
+$("theme").onclick=function(){var d=document.documentElement,dark=d.dataset.theme==="dark"||(!d.dataset.theme&&matchMedia("(prefers-color-scheme:dark)").matches);d.dataset.theme=dark?"light":"dark"};
+$("wipe").onclick=function(){if(confirm("Delete all products and bills?")){S={products:[],bills:[],shop:S.shop,no:0};persist();cnt={};draw();drawSales()}};
+var SF={shopn:"name",shopa:"addr",shopp:"phone",shopt:"title",shopc:"cashier",shopg:"gst",shopf:"foot",shopw:"paper"};
+Object.keys(SF).forEach(function(id){$(id).value=S.shop[SF[id]]||"";$(id).oninput=function(){S.shop[SF[id]]=this.value;persist()}});
+$("cust").oninput=$("recv").oninput=$("disc").oninput;$("hsearch").oninput=drawHist;
+$("mdel").onclick=function(){if(!cur||!confirm("Delete this bill? Sales totals will change."))return;var i=S.bills.indexOf(cur);if(i>-1){S.bills.splice(i,1);persist()}$("modal").hidden=true;drawHist();drawToday()};
+$("trep").onclick=function(){var a=topArr(soldToday()),amt=0,n=0,o;S.bills.forEach(function(b){if(b.d===today()){amt+=b.total;n++}});o=[S.shop.name,"Sales report "+fd(today()),"Total: Rs "+f2(amt),"Bills: "+n,"","Sold:"];a.forEach(function(x){o.push(x[0]+" x "+x[1])});
+ try{navigator.clipboard.writeText(o.join("\n")).then(function(){$("trep").textContent="Copied";setTimeout(function(){$("trep").textContent="Copy today’s report"},1500)})}catch(e){}};
+$("mshare").onclick=shareImg;$("sclose").onclick=function(){$("sov").hidden=true};
+$("pay").oninput=$("disc").oninput;$("tBillsList").onclick=$("hist").onclick;setPaper();
+draw();
+</script>
+</body>
+</html>
