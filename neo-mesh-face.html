@@ -24,7 +24,7 @@ input[type=range]{width:100%;accent-color:var(--cyan);cursor:pointer}
 .modes{display:grid;grid-template-columns:1fr 1fr;gap:8px}.mode{border:1px solid var(--line);background:#0b1222;color:#b8c5df;border-radius:10px;padding:10px 8px;font-size:12px;cursor:pointer;transition:.2s}.mode.active,.mode:hover{border-color:var(--cyan);background:#143047;color:white;box-shadow:inset 0 0 18px #45e6ff12}
 .colors{display:flex;gap:10px}.swatch{width:27px;height:27px;border:2px solid transparent;border-radius:50%;cursor:pointer}.swatch.active{outline:2px solid white;outline-offset:3px}
 .actions{display:flex;gap:9px;margin-top:24px}.btn{border:0;border-radius:11px;padding:12px 14px;font-weight:750;cursor:pointer;font-size:12px}.primary{background:var(--cyan);color:#06111b;flex:1}.secondary{background:#1a2740;color:#e4edff;border:1px solid #334763}.btn:hover{filter:brightness(1.1);transform:translateY(-1px)}
-.note{font-size:11px;color:#7383a1;margin-top:18px;line-height:1.6}
+.theme-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.theme-btn{border:1px solid #34435e;background:#0a1222;color:#dceaff;border-radius:10px;padding:10px 5px;font-size:11px;cursor:pointer}.theme-btn.active{border-color:#67efff;box-shadow:0 0 0 1px #67efff55,0 0 18px #67efff22}.theme-dot{display:block;width:24px;height:24px;border-radius:50%;margin:0 auto 6px;border:1px solid #ffffff66}.note{font-size:11px;color:#7383a1;margin-top:18px;line-height:1.6}
 footer{max-width:1180px;margin:0 auto;padding:0 22px 30px;color:#61718f;font-size:11px;display:flex;justify-content:space-between}
 @media(max-width:820px){.workspace{grid-template-columns:1fr}.stage{min-height:440px}.canvas-wrap{min-height:340px}canvas{max-height:360px}nav{display:none}main{padding-top:40px}}
 @media(max-width:420px){.stage{padding:10px}.controls{padding:17px}.stage-bottom{font-size:9px}}
@@ -47,6 +47,14 @@ footer{max-width:1180px;margin:0 auto;padding:0 22px 30px;color:#61718f;font-siz
 <div class="group" style="display:none"><label>Rotation <span class="value" id="rotationVal">0°</span></label><input id="rotation" type="range" min="-35" max="35" value="0"></div>
 <div class="group" style="display:none"><label>Render style</label><div class="modes"><button class="mode active" data-mode="wire">Wireframe</button><button class="mode" data-mode="points">Particles</button><button class="mode" data-mode="solid">Neon contours</button><button class="mode" data-mode="mixed">Hybrid</button></div></div>
 <div class="group" style="display:none"><label>Accent colour</label><div class="colors"><button class="swatch active" data-color="#45e6ff" style="background:#45e6ff" aria-label="Cyan"></button><button class="swatch" data-color="#b18cff" style="background:#b18cff" aria-label="Violet"></button><button class="swatch" data-color="#55f0b0" style="background:#55f0b0" aria-label="Mint"></button><button class="swatch" data-color="#ff8cba" style="background:#ff8cba" aria-label="Pink"></button><button class="swatch" data-color="#f6c96b" style="background:#f6c96b" aria-label="Amber"></button></div></div>
+<div class="group"><label>Mask finish / colour</label><div class="theme-grid">
+<button class="theme-btn active" data-theme="classic"><i class="theme-dot" style="background:linear-gradient(135deg,#fff,#777)"></i>Classic</button>
+<button class="theme-btn" data-theme="gold"><i class="theme-dot" style="background:linear-gradient(135deg,#fff0a6,#9d5b08)"></i>Gold</button>
+<button class="theme-btn" data-theme="crimson"><i class="theme-dot" style="background:linear-gradient(135deg,#ff9a9a,#650b20)"></i>Crimson</button>
+<button class="theme-btn" data-theme="carbon"><i class="theme-dot" style="background:linear-gradient(135deg,#68778c,#080b12)"></i>Carbon</button>
+<button class="theme-btn" data-theme="ice"><i class="theme-dot" style="background:linear-gradient(135deg,#e5ffff,#2b9db5)"></i>Ice</button>
+<button class="theme-btn" data-theme="violet"><i class="theme-dot" style="background:linear-gradient(135deg,#e7baff,#53238c)"></i>Violet</button>
+</div></div>
 <div class="actions"><button class="btn primary" id="capture">↓ Capture image</button><button class="btn secondary" id="pause">Pause</button></div>
 <div class="group capture-tools">
 <label>Camera & recording <span class="value" id="recStatus">CAMERA OFF</span></label>
@@ -58,7 +66,13 @@ footer{max-width:1180px;margin:0 auto;padding:0 22px 30px;color:#61718f;font-siz
 <button class="btn primary" id="recordVideo">● Record video</button><button class="btn secondary" id="stopVideo" disabled>Stop</button>
 </div>
 <div class="actions" style="flex-wrap:wrap;margin-top:9px">
-<button class="btn secondary" id="downloadVideo" disabled>↓ Download video</button>
+<button class="btn secondary" id="downloadVideo" disabled>↓ Download camera video</button>
+</div>
+<div class="actions" style="flex-wrap:wrap;margin-top:15px">
+<button class="btn primary" id="screenRecord">▣ Record screen</button><button class="btn secondary" id="screenStop" disabled>Stop screen</button>
+</div>
+<div class="actions" style="flex-wrap:wrap;margin-top:9px">
+<button class="btn secondary" id="screenDownload" disabled>↓ Download screen video</button>
 </div>
 <div class="actions" style="flex-wrap:wrap;margin-top:9px">
 <button class="btn secondary" id="recordAudio">● Record audio</button><button class="btn secondary" id="stopAudio" disabled>Stop audio</button><button class="btn secondary" id="downloadAudio" disabled>↓ Audio</button>
@@ -71,7 +85,7 @@ footer{max-width:1180px;margin:0 auto;padding:0 22px 30px;color:#61718f;font-siz
 </main>
 <footer id="about"><span>NEO MESH · EXPERIMENTAL DIGITAL ART</span><span>MADE FOR THE FUTURE ↗</span></footer>
 <script>
-(()=>{const c=document.getElementById('mesh'),ctx=c.getContext('2d');let density=64,glow=75,rotation=0,mode='wire',accent='#45e6ff',paused=false,raf=0,t=0;const $=id=>document.getElementById(id);
+(()=>{const c=document.getElementById('mesh'),ctx=c.getContext('2d');let density=64,glow=75,rotation=0,mode='wire',accent='#45e6ff',paused=false,raf=0,t=0;let maskTheme='classic';const themes={classic:{top:'#f7f7f2',mid:'#c9d0d5',bottom:'#737e89',edge:'#f7ffff',eye:'#05080e',detail:'#ffffff'},gold:{top:'#fff0b0',mid:'#d9a63e',bottom:'#70400b',edge:'#ffe7a0',eye:'#100b04',detail:'#fff5cf'},crimson:{top:'#ffb2b5',mid:'#c82d48',bottom:'#4c071c',edge:'#ff9aa9',eye:'#12040a',detail:'#ffe1e5'},carbon:{top:'#8b9aab',mid:'#303d4d',bottom:'#080d16',edge:'#b6d7e8',eye:'#020407',detail:'#d5e5ef'},ice:{top:'#f2ffff',mid:'#9bdce8',bottom:'#286c83',edge:'#d9ffff',eye:'#03131b',detail:'#ffffff'},violet:{top:'#f0d6ff',mid:'#9b62c9',bottom:'#32114f',edge:'#e7baff',eye:'#0b0412',detail:'#fff0ff'}};const $=id=>document.getElementById(id);
 const hex=a=>{let h=a.replace('#','');return [0,2,4].map(i=>parseInt(h.slice(i,i+2),16))};
 function face(u,v){const w=Math.sqrt(Math.max(0,1-v*v));let x= Math.sin(u)*w*.74;let z=Math.cos(u)*w;let y=v*.98;
  // narrow jaw and forehead proportions
@@ -101,28 +115,26 @@ function draw(time){
    ctx.save();
    // Face-fitted dark mask silhouette
    ctx.beginPath();boundary.forEach((id,i)=>{const p=pt(id);if(i===0)ctx.moveTo(...p);else ctx.lineTo(...p)});ctx.closePath();
-   const fill=ctx.createLinearGradient(0,150,0,440);fill.addColorStop(0,'rgba(8,12,22,.94)');fill.addColorStop(.55,'rgba(18,23,36,.97)');fill.addColorStop(1,'rgba(5,8,15,.96)');
-   ctx.fillStyle=fill;ctx.shadowColor='#00eaff';ctx.shadowBlur=18;ctx.fill();ctx.shadowBlur=0;
-   ctx.strokeStyle='#57eaff';ctx.lineWidth=3;ctx.stroke();
+   const th=themes[maskTheme];const fill=ctx.createLinearGradient(0,145,0,455);fill.addColorStop(0,th.top);fill.addColorStop(.28,th.mid);fill.addColorStop(.72,th.mid);fill.addColorStop(1,th.bottom);ctx.fillStyle=fill;ctx.shadowColor=th.edge;ctx.shadowBlur=22;ctx.fill();ctx.shadowBlur=0;ctx.strokeStyle=th.edge;ctx.lineWidth=3.5;ctx.stroke();ctx.globalAlpha=.32;ctx.strokeStyle=th.detail;ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(pt(234)[0]+5,pt(234)[1]+8);ctx.quadraticCurveTo(pt(127)[0]+24,pt(127)[1]+45,pt(172)[0]+20,pt(172)[1]+2);ctx.moveTo(pt(454)[0]-5,pt(454)[1]+8);ctx.quadraticCurveTo(pt(356)[0]-24,pt(356)[1]+45,pt(397)[0]-20,pt(397)[1]+2);ctx.stroke();ctx.globalAlpha=1;
    // Eye openings: follow both eye contours
    const eyePaths=[[33,160,158,133,153,144,163,7],[362,385,387,263,373,380,390,249]];
-   eyePaths.forEach(ids=>{ctx.beginPath();ids.forEach((id,i)=>{const p=pt(id);if(i===0)ctx.moveTo(...p);else ctx.lineTo(...p)});ctx.closePath();ctx.fillStyle='rgba(2,5,12,.98)';ctx.fill();ctx.strokeStyle='#9df7ff';ctx.lineWidth=2.4;ctx.stroke()});
+   eyePaths.forEach(ids=>{ctx.beginPath();ids.forEach((id,i)=>{const p=pt(id);if(i===0)ctx.moveTo(...p);else ctx.lineTo(...p)});ctx.closePath();ctx.fillStyle=th.eye;ctx.fill();ctx.strokeStyle=th.edge;ctx.lineWidth=2.8;ctx.stroke()});
    // Bright stylized brows
-   ctx.strokeStyle='#eafcff';ctx.lineWidth=6;ctx.lineCap='round';
+   ctx.strokeStyle=th.edge;ctx.lineWidth=6;ctx.lineCap='round';
    [[70,63,105],[300,293,334]].forEach(ids=>{ctx.beginPath();ids.forEach((id,i)=>{const p=pt(id);if(i===0)ctx.moveTo(...p);else ctx.lineTo(...p)});ctx.stroke()});
    // Nose bridge and pointed nose
-   ctx.beginPath();[168,6,197,195,5,4].forEach((id,i)=>{const p=pt(id);if(i===0)ctx.moveTo(...p);else ctx.lineTo(...p)});ctx.strokeStyle='#d7faff';ctx.lineWidth=3;ctx.stroke();
+   ctx.beginPath();[168,6,197,195,5,4].forEach((id,i)=>{const p=pt(id);if(i===0)ctx.moveTo(...p);else ctx.lineTo(...p)});ctx.strokeStyle=th.detail;ctx.lineWidth=3;ctx.stroke();
    // Mouth opening and moustache contours track lip landmarks
    const lips=[61,146,91,181,84,17,314,405,321,375,291,308,324,318,402,317,14,87,178,88,95,78,191,80,81,82];
    ctx.beginPath();lips.forEach((id,i)=>{const p=pt(id);if(i===0)ctx.moveTo(...p);else ctx.lineTo(...p)});ctx.closePath();
-   ctx.fillStyle='rgba(5,8,15,.98)';ctx.fill();ctx.strokeStyle='#eafcff';ctx.lineWidth=2.3;ctx.stroke();
+   ctx.fillStyle=th.eye;ctx.fill();ctx.strokeStyle=th.edge;ctx.lineWidth=2.5;ctx.stroke();
    // Hacker-mask moustache: curved wings sit just above the upper lip
    const left=pt(61),right=pt(291),top=pt(13),midX=(left[0]+right[0])/2,midY=top[1]-8;
-   ctx.beginPath();ctx.moveTo(midX,midY);ctx.quadraticCurveTo(midX-35,midY-23,left[0],left[1]-3);ctx.quadraticCurveTo(midX-12,midY+3,midX,midY+2);ctx.quadraticCurveTo(midX+12,midY+3,right[0],right[1]-3);ctx.quadraticCurveTo(midX+35,midY-23,midX,midY);ctx.fillStyle='#eafcff';ctx.fill();
+   ctx.beginPath();ctx.moveTo(midX,midY);ctx.quadraticCurveTo(midX-35,midY-23,left[0],left[1]-3);ctx.quadraticCurveTo(midX-12,midY+3,midX,midY+2);ctx.quadraticCurveTo(midX+12,midY+3,right[0],right[1]-3);ctx.quadraticCurveTo(midX+35,midY-23,midX,midY);ctx.fillStyle=th.detail;ctx.fill();
    // Chin/goatee point moves with jaw
-   const chin=pt(152), lower=pt(17);ctx.beginPath();ctx.moveTo(chin[0]-27,chin[1]-20);ctx.quadraticCurveTo(chin[0],chin[1]+24,chin[0]+27,chin[1]-20);ctx.quadraticCurveTo(chin[0],chin[1]-5,chin[0]-27,chin[1]-20);ctx.fillStyle='rgba(220,245,255,.9)';ctx.fill();
+   const chin=pt(152), lower=pt(17);ctx.beginPath();ctx.moveTo(chin[0]-27,chin[1]-20);ctx.quadraticCurveTo(chin[0],chin[1]+24,chin[0]+27,chin[1]-20);ctx.quadraticCurveTo(chin[0],chin[1]-5,chin[0]-27,chin[1]-20);ctx.fillStyle=th.detail;ctx.fill();
    // Small cyan circuit accents
-   ctx.strokeStyle='rgba(69,230,255,.85)';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(pt(234)[0],pt(234)[1]);ctx.lineTo(pt(127)[0]-18,pt(127)[1]+14);ctx.moveTo(pt(454)[0],pt(454)[1]);ctx.lineTo(pt(356)[0]+18,pt(356)[1]+14);ctx.stroke();
+   ctx.strokeStyle=th.edge;ctx.lineWidth=1.8;ctx.beginPath();ctx.moveTo(pt(234)[0],pt(234)[1]);ctx.lineTo(pt(127)[0]-18,pt(127)[1]+14);ctx.moveTo(pt(454)[0],pt(454)[1]);ctx.lineTo(pt(356)[0]+18,pt(356)[1]+14);ctx.stroke();
    ctx.restore();$('readout').textContent='MASK LOCKED · LIVE';
  } else {$('readout').textContent=tracking?'SEARCHING FOR FACE':'CAMERA OFF'}
  raf=requestAnimationFrame(draw)
@@ -136,11 +148,15 @@ $('pause').addEventListener('click',()=>{paused=!paused;$('pause').textContent=p
 $('capture').addEventListener('click',()=>{const a=document.createElement('a');a.download='neo-mesh-face.png';a.href=c.toDataURL('image/png');a.click()});
 
 let cameraStream=null,videoRecorder=null,audioRecorder=null,videoChunks=[],audioChunks=[],videoBlob=null,audioBlob=null,faceMesh=null,liveLandmarks=null,tracking=false,faceLoopBusy=false;
-const status=$('recStatus'),preview=$('cameraPreview');
+const status=$('recStatus'),preview=$('cameraPreview');let screenStream=null,screenRecorder=null,screenChunks=[],screenBlob=null;
 async function openCamera(){try{cameraStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user'},audio:true});preview.srcObject=cameraStream;await preview.play();status.textContent='CAMERA READY'}catch(e){status.textContent='PERMISSION DENIED';alert('Could not open camera/microphone. Allow access and use HTTPS or localhost. '+e.message)}}
 async function startFaceTracking(){if(!cameraStream)await openCamera();if(!cameraStream)return;if(!window.FaceMesh){alert('Face tracking library did not load. Check your internet connection and refresh.');return}try{if(!faceMesh){faceMesh=new FaceMesh({locateFile:file=>'https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/'+file});faceMesh.setOptions({maxNumFaces:1,refineLandmarks:true,minDetectionConfidence:.55,minTrackingConfidence:.55});faceMesh.onResults(results=>{liveLandmarks=results.multiFaceLandmarks&&results.multiFaceLandmarks[0]?results.multiFaceLandmarks[0]:null;status.textContent=liveLandmarks?'HACKER MASK LOCKED':'SEARCHING FOR FACE'})}tracking=true;$('trackFace').textContent='Stop hacker mask';$('trackFace').classList.add('active');status.textContent='FINDING FACE';const tick=async()=>{if(!tracking||!cameraStream)return;if(!faceLoopBusy&&preview.readyState>=2){faceLoopBusy=true;try{await faceMesh.send({image:preview})}catch(e){}faceLoopBusy=false}if(tracking)requestAnimationFrame(tick)};tick()}catch(e){alert('Could not start face tracking: '+e.message)}}
 function stopFaceTracking(){tracking=false;liveLandmarks=null;$('trackFace').textContent='Start live face mesh';$('trackFace').classList.remove('active');status.textContent=cameraStream?'CAMERA READY':'CAMERA OFF'}
 function closeCamera(){if(cameraStream){cameraStream.getTracks().forEach(track=>track.stop());cameraStream=null;preview.srcObject=null;status.textContent='CAMERA OFF'}}
+document.querySelectorAll('.theme-btn').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.theme-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');maskTheme=b.dataset.theme}));
+$('screenRecord').addEventListener('click',async()=>{try{screenStream=await navigator.mediaDevices.getDisplayMedia({video:{frameRate:30},audio:true});screenChunks=[];screenRecorder=new MediaRecorder(screenStream);screenRecorder.ondataavailable=e=>{if(e.data.size)screenChunks.push(e.data)};screenRecorder.onstop=()=>{screenBlob=new Blob(screenChunks,{type:screenRecorder.mimeType||'video/webm'});$('screenDownload').disabled=false;status.textContent='SCREEN VIDEO READY';$('screenRecord').disabled=false;$('screenStop').disabled=true};screenStream.getVideoTracks()[0].addEventListener('ended',()=>{if(screenRecorder&&screenRecorder.state!=='inactive')screenRecorder.stop()});screenRecorder.start(250);$('screenRecord').disabled=true;$('screenStop').disabled=false;status.textContent='RECORDING SCREEN'}catch(e){status.textContent='SCREEN SHARE CANCELLED';if(e.name!=='NotAllowedError')alert('Screen recording could not start: '+e.message)}});
+$('screenStop').addEventListener('click',()=>{if(screenRecorder&&screenRecorder.state!=='inactive')screenRecorder.stop();if(screenStream)screenStream.getTracks().forEach(t=>t.stop());screenStream=null});
+$('screenDownload').addEventListener('click',()=>{if(!screenBlob)return;const a=document.createElement('a');a.href=URL.createObjectURL(screenBlob);a.download='live-hacker-mask-screen-recording.webm';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)});
 $('cameraOn').addEventListener('click',openCamera);$('trackFace').addEventListener('click',()=>tracking?stopFaceTracking():startFaceTracking());$('cameraOff').addEventListener('click',()=>{stopFaceTracking();closeCamera()});
 $('recordVideo').addEventListener('click',async()=>{if(!cameraStream)await openCamera();if(!cameraStream)return;try{videoChunks=[];videoRecorder=new MediaRecorder(cameraStream);videoRecorder.ondataavailable=e=>{if(e.data.size)videoChunks.push(e.data)};videoRecorder.onstop=()=>{videoBlob=new Blob(videoChunks,{type:videoRecorder.mimeType||'video/webm'});$('downloadVideo').disabled=false;status.textContent='VIDEO READY'};videoRecorder.start();$('recordVideo').disabled=true;$('stopVideo').disabled=false;status.textContent='RECORDING VIDEO'}catch(e){alert('Video recording is not supported in this browser: '+e.message)}});
 $('stopVideo').addEventListener('click',()=>{if(videoRecorder&&videoRecorder.state!=='inactive'){videoRecorder.stop();$('recordVideo').disabled=false;$('stopVideo').disabled=true}});
@@ -148,7 +164,7 @@ $('downloadVideo').addEventListener('click',()=>{if(!videoBlob)return;const a=do
 $('recordAudio').addEventListener('click',async()=>{if(!cameraStream)await openCamera();if(!cameraStream)return;try{audioChunks=[];audioRecorder=new MediaRecorder(new MediaStream(cameraStream.getAudioTracks()));audioRecorder.ondataavailable=e=>{if(e.data.size)audioChunks.push(e.data)};audioRecorder.onstop=()=>{audioBlob=new Blob(audioChunks,{type:audioRecorder.mimeType||'audio/webm'});$('downloadAudio').disabled=false;status.textContent='AUDIO READY'};audioRecorder.start();$('recordAudio').disabled=true;$('stopAudio').disabled=false;status.textContent='RECORDING AUDIO'}catch(e){alert('Audio recording is not supported in this browser: '+e.message)}});
 $('stopAudio').addEventListener('click',()=>{if(audioRecorder&&audioRecorder.state!=='inactive'){audioRecorder.stop();$('recordAudio').disabled=false;$('stopAudio').disabled=true}});
 $('downloadAudio').addEventListener('click',()=>{if(!audioBlob)return;const a=document.createElement('a');a.href=URL.createObjectURL(audioBlob);a.download='neo-mesh-audio-recording.webm';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)});
-window.addEventListener('pagehide',()=>{stopFaceTracking();closeCamera()});
+window.addEventListener('pagehide',()=>{stopFaceTracking();closeCamera();if(screenStream)screenStream.getTracks().forEach(t=>t.stop())});
 
 draw(0);
 })();
