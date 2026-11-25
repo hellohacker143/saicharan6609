@@ -47,7 +47,24 @@ footer{max-width:1180px;margin:0 auto;padding:0 22px 30px;color:#61718f;font-siz
 <div class="group"><label>Render style</label><div class="modes"><button class="mode active" data-mode="wire">Wireframe</button><button class="mode" data-mode="points">Particles</button><button class="mode" data-mode="solid">Neon contours</button><button class="mode" data-mode="mixed">Hybrid</button></div></div>
 <div class="group"><label>Accent colour</label><div class="colors"><button class="swatch active" data-color="#45e6ff" style="background:#45e6ff" aria-label="Cyan"></button><button class="swatch" data-color="#b18cff" style="background:#b18cff" aria-label="Violet"></button><button class="swatch" data-color="#55f0b0" style="background:#55f0b0" aria-label="Mint"></button><button class="swatch" data-color="#ff8cba" style="background:#ff8cba" aria-label="Pink"></button><button class="swatch" data-color="#f6c96b" style="background:#f6c96b" aria-label="Amber"></button></div></div>
 <div class="actions"><button class="btn primary" id="capture">↓ Capture image</button><button class="btn secondary" id="pause">Pause</button></div>
-<p class="note">This is a generated interactive visualization, not a camera scan or biometric identification. No camera access or personal data is used.</p>
+<div class="group capture-tools">
+<label>Camera & recording <span class="value" id="recStatus">CAMERA OFF</span></label>
+<video id="cameraPreview" autoplay muted playsinline style="width:100%;aspect-ratio:16/9;object-fit:cover;background:#050914;border:1px solid #263653;border-radius:12px;display:block;margin:10px 0"></video>
+<div class="actions" style="flex-wrap:wrap;margin-top:10px">
+<button class="btn secondary" id="cameraOn">Open camera</button><button class="btn secondary" id="cameraOff">Close camera</button>
+</div>
+<div class="actions" style="flex-wrap:wrap;margin-top:9px">
+<button class="btn primary" id="recordVideo">● Record video</button><button class="btn secondary" id="stopVideo" disabled>Stop</button>
+</div>
+<div class="actions" style="flex-wrap:wrap;margin-top:9px">
+<button class="btn secondary" id="downloadVideo" disabled>↓ Download video</button>
+</div>
+<div class="actions" style="flex-wrap:wrap;margin-top:9px">
+<button class="btn secondary" id="recordAudio">● Record audio</button><button class="btn secondary" id="stopAudio" disabled>Stop audio</button><button class="btn secondary" id="downloadAudio" disabled>↓ Audio</button>
+</div>
+<p class="note">Camera and microphone access requires your permission and a secure HTTPS page (or localhost). Recordings are created in your browser and downloaded to your device; nothing is uploaded.</p>
+</div>
+<p class="note">This is a generated interactive visualization. Camera and microphone are only activated when you press the buttons.</p>
 </aside>
 </section>
 </main>
@@ -87,6 +104,20 @@ document.querySelectorAll('.mode').forEach(b=>b.addEventListener('click',()=>{do
 document.querySelectorAll('.swatch').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.swatch').forEach(x=>x.classList.remove('active'));b.classList.add('active');accent=b.dataset.color}));
 $('pause').addEventListener('click',()=>{paused=!paused;$('pause').textContent=paused?'Resume':'Pause';if(!paused)requestAnimationFrame(draw)});
 $('capture').addEventListener('click',()=>{const a=document.createElement('a');a.download='neo-mesh-face.png';a.href=c.toDataURL('image/png');a.click()});
+
+let cameraStream=null,videoRecorder=null,audioRecorder=null,videoChunks=[],audioChunks=[],videoBlob=null,audioBlob=null;
+const status=$('recStatus'),preview=$('cameraPreview');
+async function openCamera(){try{cameraStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user'},audio:true});preview.srcObject=cameraStream;status.textContent='CAMERA READY'}catch(e){status.textContent='PERMISSION DENIED';alert('Could not open camera/microphone. Allow access and use HTTPS or localhost. '+e.message)}}
+function closeCamera(){if(cameraStream){cameraStream.getTracks().forEach(track=>track.stop());cameraStream=null;preview.srcObject=null;status.textContent='CAMERA OFF'}}
+$('cameraOn').addEventListener('click',openCamera);$('cameraOff').addEventListener('click',closeCamera);
+$('recordVideo').addEventListener('click',async()=>{if(!cameraStream)await openCamera();if(!cameraStream)return;try{videoChunks=[];videoRecorder=new MediaRecorder(cameraStream);videoRecorder.ondataavailable=e=>{if(e.data.size)videoChunks.push(e.data)};videoRecorder.onstop=()=>{videoBlob=new Blob(videoChunks,{type:videoRecorder.mimeType||'video/webm'});$('downloadVideo').disabled=false;status.textContent='VIDEO READY'};videoRecorder.start();$('recordVideo').disabled=true;$('stopVideo').disabled=false;status.textContent='RECORDING VIDEO'}catch(e){alert('Video recording is not supported in this browser: '+e.message)}});
+$('stopVideo').addEventListener('click',()=>{if(videoRecorder&&videoRecorder.state!=='inactive'){videoRecorder.stop();$('recordVideo').disabled=false;$('stopVideo').disabled=true}});
+$('downloadVideo').addEventListener('click',()=>{if(!videoBlob)return;const a=document.createElement('a');a.href=URL.createObjectURL(videoBlob);a.download='neo-mesh-camera-recording.webm';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)});
+$('recordAudio').addEventListener('click',async()=>{if(!cameraStream)await openCamera();if(!cameraStream)return;try{audioChunks=[];audioRecorder=new MediaRecorder(new MediaStream(cameraStream.getAudioTracks()));audioRecorder.ondataavailable=e=>{if(e.data.size)audioChunks.push(e.data)};audioRecorder.onstop=()=>{audioBlob=new Blob(audioChunks,{type:audioRecorder.mimeType||'audio/webm'});$('downloadAudio').disabled=false;status.textContent='AUDIO READY'};audioRecorder.start();$('recordAudio').disabled=true;$('stopAudio').disabled=false;status.textContent='RECORDING AUDIO'}catch(e){alert('Audio recording is not supported in this browser: '+e.message)}});
+$('stopAudio').addEventListener('click',()=>{if(audioRecorder&&audioRecorder.state!=='inactive'){audioRecorder.stop();$('recordAudio').disabled=false;$('stopAudio').disabled=true}});
+$('downloadAudio').addEventListener('click',()=>{if(!audioBlob)return;const a=document.createElement('a');a.href=URL.createObjectURL(audioBlob);a.download='neo-mesh-audio-recording.webm';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)});
+window.addEventListener('pagehide',closeCamera);
+
 draw(0);
 })();
 </script>
