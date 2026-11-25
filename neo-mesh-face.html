@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#080b16"><title>NEO MESH — Face Lab</title>
+<meta name="theme-color" content="#080b16"><title>LIVE HACKER MASK — Face Cam</title>
 <style>
 :root{--bg:#080b16;--panel:#101629;--line:#263653;--cyan:#45e6ff;--violet:#a78bfa;--text:#edf4ff;--muted:#8795b2}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% 0%,#142647 0%,#080b16 55%);color:var(--text);font:15px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif;min-height:100vh}
@@ -32,27 +32,27 @@ footer{max-width:1180px;margin:0 auto;padding:0 22px 30px;color:#61718f;font-siz
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js"></script>
 </head>
 <body>
-<header><div class="brand">NEO<b>•</b>MESH</div><nav><a href="#studio">STUDIO</a><a href="#controls">CONTROLS</a><a href="#about">ABOUT</a></nav><div class="eyebrow">REAL-TIME VISUAL LAB</div></header>
+<header><div class="brand">LIVE<b>•</b>MASK</div><nav><a href="#studio">STUDIO</a><a href="#controls">CONTROLS</a><a href="#about">ABOUT</a></nav><div class="eyebrow">LIVE FACE MASK CAMERA</div></header>
 <main>
-<div class="eyebrow">DIGITAL IDENTITY / 001</div>
-<h1>Meet your <span>neo face.</span></h1>
-<p class="intro">A futuristic face-mesh experience. Explore a glowing wireframe portrait, tune its geometry, and capture your favourite look.</p>
+<div class="eyebrow">ANONYMOUS STYLE / LIVE TRACKING</div>
+<h1>Live <span>Hacker Mask.</span></h1>
+<p class="intro">One real-time face-tracked hacker mask. Move your head, blink and speak — the mask follows your face and mouth.</p>
 <section class="workspace" id="studio">
-<div class="stage"><div class="stage-top"><span>LIVE RENDER / FACE MESH</span><span class="status"><i class="dot"></i> SYSTEM ACTIVE</span></div>
+<div class="stage"><div class="stage-top"><span>LIVE CAMERA / HACKER MASK</span><span class="status"><i class="dot"></i> SYSTEM ACTIVE</span></div>
 <div class="canvas-wrap"><canvas id="mesh" width="720" height="520" aria-label="Animated abstract wireframe human face"></canvas><div class="scanline"></div></div>
-<div class="stage-bottom"><span>NEURAL GEOMETRY ENGINE</span><span id="readout">642 NODES · 1,184 EDGES</span></div></div>
-<aside class="controls" id="controls"><h2>Mesh controls</h2><div class="sub">Shape the face in real time</div>
-<div class="group"><label>Mesh density <span class="value" id="densityVal">64%</span></label><input id="density" type="range" min="20" max="100" value="64"></div>
-<div class="group"><label>Glow intensity <span class="value" id="glowVal">75%</span></label><input id="glow" type="range" min="10" max="100" value="75"></div>
-<div class="group"><label>Rotation <span class="value" id="rotationVal">0°</span></label><input id="rotation" type="range" min="-35" max="35" value="0"></div>
-<div class="group"><label>Render style</label><div class="modes"><button class="mode active" data-mode="wire">Wireframe</button><button class="mode" data-mode="points">Particles</button><button class="mode" data-mode="solid">Neon contours</button><button class="mode" data-mode="mixed">Hybrid</button></div></div>
-<div class="group"><label>Accent colour</label><div class="colors"><button class="swatch active" data-color="#45e6ff" style="background:#45e6ff" aria-label="Cyan"></button><button class="swatch" data-color="#b18cff" style="background:#b18cff" aria-label="Violet"></button><button class="swatch" data-color="#55f0b0" style="background:#55f0b0" aria-label="Mint"></button><button class="swatch" data-color="#ff8cba" style="background:#ff8cba" aria-label="Pink"></button><button class="swatch" data-color="#f6c96b" style="background:#f6c96b" aria-label="Amber"></button></div></div>
+<div class="stage-bottom"><span>FACE-LOCK TRACKING</span><span id="readout">WAITING FOR CAMERA</span></div></div>
+<aside class="controls" id="controls"><h2>Live mask controls</h2><div class="sub">Start the camera and lock the mask to your face</div>
+<div class="group" style="display:none"><label>Mesh density <span class="value" id="densityVal">64%</span></label><input id="density" type="range" min="20" max="100" value="64"></div>
+<div class="group" style="display:none"><label>Glow intensity <span class="value" id="glowVal">75%</span></label><input id="glow" type="range" min="10" max="100" value="75"></div>
+<div class="group" style="display:none"><label>Rotation <span class="value" id="rotationVal">0°</span></label><input id="rotation" type="range" min="-35" max="35" value="0"></div>
+<div class="group" style="display:none"><label>Render style</label><div class="modes"><button class="mode active" data-mode="wire">Wireframe</button><button class="mode" data-mode="points">Particles</button><button class="mode" data-mode="solid">Neon contours</button><button class="mode" data-mode="mixed">Hybrid</button></div></div>
+<div class="group" style="display:none"><label>Accent colour</label><div class="colors"><button class="swatch active" data-color="#45e6ff" style="background:#45e6ff" aria-label="Cyan"></button><button class="swatch" data-color="#b18cff" style="background:#b18cff" aria-label="Violet"></button><button class="swatch" data-color="#55f0b0" style="background:#55f0b0" aria-label="Mint"></button><button class="swatch" data-color="#ff8cba" style="background:#ff8cba" aria-label="Pink"></button><button class="swatch" data-color="#f6c96b" style="background:#f6c96b" aria-label="Amber"></button></div></div>
 <div class="actions"><button class="btn primary" id="capture">↓ Capture image</button><button class="btn secondary" id="pause">Pause</button></div>
 <div class="group capture-tools">
 <label>Camera & recording <span class="value" id="recStatus">CAMERA OFF</span></label>
-<video id="cameraPreview" autoplay muted playsinline style="width:100%;aspect-ratio:16/9;object-fit:cover;background:#050914;border:1px solid #263653;border-radius:12px;display:block;margin:10px 0"></video>
+<video id="cameraPreview" autoplay muted playsinline style="width:1px;height:1px;opacity:0;position:absolute;pointer-events:none"></video>
 <div class="actions" style="flex-wrap:wrap;margin-top:10px">
-<button class="btn secondary" id="cameraOn">Open camera</button><button class="btn primary" id="trackFace">Start live face mesh</button><button class="btn secondary" id="cameraOff">Close camera</button>
+<button class="btn secondary" id="cameraOn">Open camera</button><button class="btn primary" id="trackFace">Start hacker mask</button><button class="btn secondary" id="cameraOff">Close camera</button>
 </div>
 <div class="actions" style="flex-wrap:wrap;margin-top:9px">
 <button class="btn primary" id="recordVideo">● Record video</button><button class="btn secondary" id="stopVideo" disabled>Stop</button>
@@ -63,7 +63,7 @@ footer{max-width:1180px;margin:0 auto;padding:0 22px 30px;color:#61718f;font-siz
 <div class="actions" style="flex-wrap:wrap;margin-top:9px">
 <button class="btn secondary" id="recordAudio">● Record audio</button><button class="btn secondary" id="stopAudio" disabled>Stop audio</button><button class="btn secondary" id="downloadAudio" disabled>↓ Audio</button>
 </div>
-<p class="note">Live face tracking follows your head, expressions and lips in real time. Camera and microphone access requires your permission and a secure HTTPS page (or localhost). Recordings are created in your browser and downloaded to your device; nothing is uploaded.</p>
+<p class="note">The mask follows your face, head movement and mouth in real time. Camera and microphone access requires your permission and a secure HTTPS page (or localhost). Recordings are created in your browser and downloaded to your device; nothing is uploaded.</p>
 </div>
 <p class="note">This is a generated interactive visualization. Camera and microphone are only activated when you press the buttons.</p>
 </aside>
@@ -86,33 +86,47 @@ function face(u,v){const w=Math.sqrt(Math.max(0,1-v*v));let x= Math.sin(u)*w*.74
  return [x*1.58,y*1.78,z*1.23];
 }
 function project(p,time){const a=rotation*Math.PI/180+Math.sin(time*.00045)*.055,ca=Math.cos(a),sa=Math.sin(a);let x=p[0]*ca-p[2]*sa,z=p[0]*sa+p[2]*ca,y=p[1];const bob=Math.sin(time*.0012)*.015;const perspective=1/(1.75+z*.25);return [360+x*188*perspective,260+(y+bob)*185*perspective,z,perspective];}
-function draw(time){if(!paused)t=time;ctx.clearRect(0,0,720,520);const rows=Math.max(14,Math.round(density*.45)),cols=Math.max(20,Math.round(density*.86));let pts=[];for(let r=0;r<=rows;r++){let v=-.96+1.92*r/rows;let row=[];for(let k=0;k<=cols;k++){let u=-Math.PI/2+Math.PI*k/cols;row.push(project(face(u,v),t));}pts.push(row)}
-const [R,G,B]=hex(accent),alpha=glow/100;ctx.save();ctx.lineWidth=.8;ctx.shadowColor=accent;ctx.shadowBlur=glow*.22;
-function line(a,b,fade=1){const z=(a[2]+b[2])*.5;ctx.strokeStyle='rgba('+R+','+G+','+B+','+(alpha*(.24+Math.max(0,z+1)*.19)*fade)+')';ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.stroke()}
-if(mode==='wire'||mode==='mixed'){for(let r=0;r<pts.length;r++)for(let k=0;k<pts[r].length;k++){if(k<cols)line(pts[r][k],pts[r][k+1]);if(r<rows&&k%1===0)line(pts[r][k],pts[r+1][k]);}}
-if(mode==='solid'){for(let r=0;r<pts.length;r+=2){ctx.beginPath();for(let k=0;k<=cols;k++){let p=pts[r][k];if(k===0)ctx.moveTo(p[0],p[1]);else ctx.lineTo(p[0],p[1]);}ctx.strokeStyle='rgba('+R+','+G+','+B+','+(alpha*.65)+')';ctx.lineWidth=1.3;ctx.stroke();}}
-if(mode==='points'||mode==='mixed'){for(let r=0;r<pts.length;r++)for(let k=0;k<=cols;k++){const p=pts[r][k];ctx.fillStyle='rgba('+R+','+G+','+B+','+(alpha*.9)+')';ctx.beginPath();ctx.arc(p[0],p[1],mode==='points'?1.6:1.1,0,Math.PI*2);ctx.fill();}}
- // facial feature accents
- const feature=(x,y,rx,ry)=>{ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);ctx.strokeStyle='rgba('+R+','+G+','+B+','+(alpha*.8)+')';ctx.lineWidth=1.35;ctx.stroke()};
- feature(360-52,222,25,9);feature(360+52,222,25,9);feature(360,310,27,6);
- // Live camera face landmarks: mirrored to feel like a selfie, with lip contours highlighted
+function draw(time){
+ ctx.clearRect(0,0,720,520);
+ if(cameraStream&&preview.readyState>=2){
+   ctx.save();ctx.translate(720,0);ctx.scale(-1,1);ctx.drawImage(preview,0,0,720,520);ctx.restore();
+ } else {
+   const bg=ctx.createRadialGradient(360,240,30,360,260,430);bg.addColorStop(0,'#142b46');bg.addColorStop(1,'#050914');ctx.fillStyle=bg;ctx.fillRect(0,0,720,520);
+   ctx.fillStyle='#a9bbd5';ctx.font='18px system-ui';ctx.textAlign='center';ctx.fillText('OPEN CAMERA TO START',360,260);
+ }
  if(liveLandmarks){
    const P=liveLandmarks.map(p=>[(1-p.x)*720,p.y*520]);
-   const connections=window.FACEMESH_TESSELATION||[];
-   ctx.save();ctx.lineWidth=.55;ctx.shadowColor=accent;ctx.shadowBlur=glow*.18;
-   ctx.strokeStyle='rgba('+R+','+G+','+B+','+(alpha*.34)+')';
-   for(const edge of connections){const a=P[edge[0]],b=P[edge[1]];if(!a||!b)continue;ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.stroke()}
+   const pt=i=>P[i]||[360,260];
+   const boundary=[10,338,297,332,284,251,389,356,454,323,361,288,397,365,379,378,400,377,152,148,176,149,150,136,172,58,132,93,234,127,162,21,54,103,67,109];
+   ctx.save();
+   // Face-fitted dark mask silhouette
+   ctx.beginPath();boundary.forEach((id,i)=>{const p=pt(id);if(i===0)ctx.moveTo(...p);else ctx.lineTo(...p)});ctx.closePath();
+   const fill=ctx.createLinearGradient(0,150,0,440);fill.addColorStop(0,'rgba(8,12,22,.94)');fill.addColorStop(.55,'rgba(18,23,36,.97)');fill.addColorStop(1,'rgba(5,8,15,.96)');
+   ctx.fillStyle=fill;ctx.shadowColor='#00eaff';ctx.shadowBlur=18;ctx.fill();ctx.shadowBlur=0;
+   ctx.strokeStyle='#57eaff';ctx.lineWidth=3;ctx.stroke();
+   // Eye openings: follow both eye contours
+   const eyePaths=[[33,160,158,133,153,144,163,7],[362,385,387,263,373,380,390,249]];
+   eyePaths.forEach(ids=>{ctx.beginPath();ids.forEach((id,i)=>{const p=pt(id);if(i===0)ctx.moveTo(...p);else ctx.lineTo(...p)});ctx.closePath();ctx.fillStyle='rgba(2,5,12,.98)';ctx.fill();ctx.strokeStyle='#9df7ff';ctx.lineWidth=2.4;ctx.stroke()});
+   // Bright stylized brows
+   ctx.strokeStyle='#eafcff';ctx.lineWidth=6;ctx.lineCap='round';
+   [[70,63,105],[300,293,334]].forEach(ids=>{ctx.beginPath();ids.forEach((id,i)=>{const p=pt(id);if(i===0)ctx.moveTo(...p);else ctx.lineTo(...p)});ctx.stroke()});
+   // Nose bridge and pointed nose
+   ctx.beginPath();[168,6,197,195,5,4].forEach((id,i)=>{const p=pt(id);if(i===0)ctx.moveTo(...p);else ctx.lineTo(...p)});ctx.strokeStyle='#d7faff';ctx.lineWidth=3;ctx.stroke();
+   // Mouth opening and moustache contours track lip landmarks
    const lips=[61,146,91,181,84,17,314,405,321,375,291,308,324,318,402,317,14,87,178,88,95,78,191,80,81,82];
-   ctx.beginPath();lips.forEach((id,i)=>{const p=P[id];if(!p)return;if(i===0)ctx.moveTo(p[0],p[1]);else ctx.lineTo(p[0],p[1])});ctx.closePath();
-   ctx.strokeStyle='#ff75c8';ctx.lineWidth=2.2;ctx.shadowColor='#ff75c8';ctx.shadowBlur=12;ctx.stroke();
-   // Inner lip line makes mouth opening and speech motion visible
-   const inner=[78,191,80,81,82,13,312,311,310,415,308];
-   ctx.beginPath();inner.forEach((id,i)=>{const p=P[id];if(!p)return;if(i===0)ctx.moveTo(p[0],p[1]);else ctx.lineTo(p[0],p[1])});
-   ctx.strokeStyle='#fff0fa';ctx.lineWidth=1.4;ctx.stroke();ctx.restore();
- }
- // central facial axis and corner particles
- ctx.setLineDash([2,7]);ctx.strokeStyle='rgba('+R+','+G+','+B+','+(.17*alpha)+')';ctx.beginPath();ctx.moveTo(360,65);ctx.lineTo(360,454);ctx.stroke();ctx.setLineDash([]);
- ctx.restore();raf=requestAnimationFrame(draw)}
+   ctx.beginPath();lips.forEach((id,i)=>{const p=pt(id);if(i===0)ctx.moveTo(...p);else ctx.lineTo(...p)});ctx.closePath();
+   ctx.fillStyle='rgba(5,8,15,.98)';ctx.fill();ctx.strokeStyle='#eafcff';ctx.lineWidth=2.3;ctx.stroke();
+   // Hacker-mask moustache: curved wings sit just above the upper lip
+   const left=pt(61),right=pt(291),top=pt(13),midX=(left[0]+right[0])/2,midY=top[1]-8;
+   ctx.beginPath();ctx.moveTo(midX,midY);ctx.quadraticCurveTo(midX-35,midY-23,left[0],left[1]-3);ctx.quadraticCurveTo(midX-12,midY+3,midX,midY+2);ctx.quadraticCurveTo(midX+12,midY+3,right[0],right[1]-3);ctx.quadraticCurveTo(midX+35,midY-23,midX,midY);ctx.fillStyle='#eafcff';ctx.fill();
+   // Chin/goatee point moves with jaw
+   const chin=pt(152), lower=pt(17);ctx.beginPath();ctx.moveTo(chin[0]-27,chin[1]-20);ctx.quadraticCurveTo(chin[0],chin[1]+24,chin[0]+27,chin[1]-20);ctx.quadraticCurveTo(chin[0],chin[1]-5,chin[0]-27,chin[1]-20);ctx.fillStyle='rgba(220,245,255,.9)';ctx.fill();
+   // Small cyan circuit accents
+   ctx.strokeStyle='rgba(69,230,255,.85)';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(pt(234)[0],pt(234)[1]);ctx.lineTo(pt(127)[0]-18,pt(127)[1]+14);ctx.moveTo(pt(454)[0],pt(454)[1]);ctx.lineTo(pt(356)[0]+18,pt(356)[1]+14);ctx.stroke();
+   ctx.restore();$('readout').textContent='MASK LOCKED · LIVE';
+ } else {$('readout').textContent=tracking?'SEARCHING FOR FACE':'CAMERA OFF'}
+ raf=requestAnimationFrame(draw)
+}
 $('density').addEventListener('input',e=>{density=+e.target.value;$('densityVal').textContent=density+'%';$('readout').textContent=Math.round(density*10)+' NODES · '+Math.round(density*18.5)+' EDGES'});
 $('glow').addEventListener('input',e=>{glow=+e.target.value;$('glowVal').textContent=glow+'%'});
 $('rotation').addEventListener('input',e=>{rotation=+e.target.value;$('rotationVal').textContent=rotation+'°'});
@@ -124,7 +138,7 @@ $('capture').addEventListener('click',()=>{const a=document.createElement('a');a
 let cameraStream=null,videoRecorder=null,audioRecorder=null,videoChunks=[],audioChunks=[],videoBlob=null,audioBlob=null,faceMesh=null,liveLandmarks=null,tracking=false,faceLoopBusy=false;
 const status=$('recStatus'),preview=$('cameraPreview');
 async function openCamera(){try{cameraStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user'},audio:true});preview.srcObject=cameraStream;await preview.play();status.textContent='CAMERA READY'}catch(e){status.textContent='PERMISSION DENIED';alert('Could not open camera/microphone. Allow access and use HTTPS or localhost. '+e.message)}}
-async function startFaceTracking(){if(!cameraStream)await openCamera();if(!cameraStream)return;if(!window.FaceMesh){alert('Face tracking library did not load. Check your internet connection and refresh.');return}try{if(!faceMesh){faceMesh=new FaceMesh({locateFile:file=>'https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/'+file});faceMesh.setOptions({maxNumFaces:1,refineLandmarks:true,minDetectionConfidence:.55,minTrackingConfidence:.55});faceMesh.onResults(results=>{liveLandmarks=results.multiFaceLandmarks&&results.multiFaceLandmarks[0]?results.multiFaceLandmarks[0]:null;status.textContent=liveLandmarks?'LIVE FACE + LIPS':'SEARCHING FOR FACE'})}tracking=true;$('trackFace').textContent='Stop live face mesh';$('trackFace').classList.add('active');status.textContent='FINDING FACE';const tick=async()=>{if(!tracking||!cameraStream)return;if(!faceLoopBusy&&preview.readyState>=2){faceLoopBusy=true;try{await faceMesh.send({image:preview})}catch(e){}faceLoopBusy=false}if(tracking)requestAnimationFrame(tick)};tick()}catch(e){alert('Could not start face tracking: '+e.message)}}
+async function startFaceTracking(){if(!cameraStream)await openCamera();if(!cameraStream)return;if(!window.FaceMesh){alert('Face tracking library did not load. Check your internet connection and refresh.');return}try{if(!faceMesh){faceMesh=new FaceMesh({locateFile:file=>'https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/'+file});faceMesh.setOptions({maxNumFaces:1,refineLandmarks:true,minDetectionConfidence:.55,minTrackingConfidence:.55});faceMesh.onResults(results=>{liveLandmarks=results.multiFaceLandmarks&&results.multiFaceLandmarks[0]?results.multiFaceLandmarks[0]:null;status.textContent=liveLandmarks?'HACKER MASK LOCKED':'SEARCHING FOR FACE'})}tracking=true;$('trackFace').textContent='Stop hacker mask';$('trackFace').classList.add('active');status.textContent='FINDING FACE';const tick=async()=>{if(!tracking||!cameraStream)return;if(!faceLoopBusy&&preview.readyState>=2){faceLoopBusy=true;try{await faceMesh.send({image:preview})}catch(e){}faceLoopBusy=false}if(tracking)requestAnimationFrame(tick)};tick()}catch(e){alert('Could not start face tracking: '+e.message)}}
 function stopFaceTracking(){tracking=false;liveLandmarks=null;$('trackFace').textContent='Start live face mesh';$('trackFace').classList.remove('active');status.textContent=cameraStream?'CAMERA READY':'CAMERA OFF'}
 function closeCamera(){if(cameraStream){cameraStream.getTracks().forEach(track=>track.stop());cameraStream=null;preview.srcObject=null;status.textContent='CAMERA OFF'}}
 $('cameraOn').addEventListener('click',openCamera);$('trackFace').addEventListener('click',()=>tracking?stopFaceTracking():startFaceTracking());$('cameraOff').addEventListener('click',()=>{stopFaceTracking();closeCamera()});
