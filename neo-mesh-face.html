@@ -29,6 +29,7 @@ footer{max-width:1180px;margin:0 auto;padding:0 22px 30px;color:#61718f;font-siz
 @media(max-width:820px){.workspace{grid-template-columns:1fr}.stage{min-height:440px}.canvas-wrap{min-height:340px}canvas{max-height:360px}nav{display:none}main{padding-top:40px}}
 @media(max-width:420px){.stage{padding:10px}.controls{padding:17px}.stage-bottom{font-size:9px}}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js"></script>
 </head>
 <body>
 <header><div class="brand">NEO<b>•</b>MESH</div><nav><a href="#studio">STUDIO</a><a href="#controls">CONTROLS</a><a href="#about">ABOUT</a></nav><div class="eyebrow">REAL-TIME VISUAL LAB</div></header>
@@ -51,7 +52,7 @@ footer{max-width:1180px;margin:0 auto;padding:0 22px 30px;color:#61718f;font-siz
 <label>Camera & recording <span class="value" id="recStatus">CAMERA OFF</span></label>
 <video id="cameraPreview" autoplay muted playsinline style="width:100%;aspect-ratio:16/9;object-fit:cover;background:#050914;border:1px solid #263653;border-radius:12px;display:block;margin:10px 0"></video>
 <div class="actions" style="flex-wrap:wrap;margin-top:10px">
-<button class="btn secondary" id="cameraOn">Open camera</button><button class="btn secondary" id="cameraOff">Close camera</button>
+<button class="btn secondary" id="cameraOn">Open camera</button><button class="btn primary" id="trackFace">Start live face mesh</button><button class="btn secondary" id="cameraOff">Close camera</button>
 </div>
 <div class="actions" style="flex-wrap:wrap;margin-top:9px">
 <button class="btn primary" id="recordVideo">● Record video</button><button class="btn secondary" id="stopVideo" disabled>Stop</button>
@@ -62,7 +63,7 @@ footer{max-width:1180px;margin:0 auto;padding:0 22px 30px;color:#61718f;font-siz
 <div class="actions" style="flex-wrap:wrap;margin-top:9px">
 <button class="btn secondary" id="recordAudio">● Record audio</button><button class="btn secondary" id="stopAudio" disabled>Stop audio</button><button class="btn secondary" id="downloadAudio" disabled>↓ Audio</button>
 </div>
-<p class="note">Camera and microphone access requires your permission and a secure HTTPS page (or localhost). Recordings are created in your browser and downloaded to your device; nothing is uploaded.</p>
+<p class="note">Live face tracking follows your head, expressions and lips in real time. Camera and microphone access requires your permission and a secure HTTPS page (or localhost). Recordings are created in your browser and downloaded to your device; nothing is uploaded.</p>
 </div>
 <p class="note">This is a generated interactive visualization. Camera and microphone are only activated when you press the buttons.</p>
 </aside>
@@ -94,6 +95,21 @@ if(mode==='points'||mode==='mixed'){for(let r=0;r<pts.length;r++)for(let k=0;k<=
  // facial feature accents
  const feature=(x,y,rx,ry)=>{ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);ctx.strokeStyle='rgba('+R+','+G+','+B+','+(alpha*.8)+')';ctx.lineWidth=1.35;ctx.stroke()};
  feature(360-52,222,25,9);feature(360+52,222,25,9);feature(360,310,27,6);
+ // Live camera face landmarks: mirrored to feel like a selfie, with lip contours highlighted
+ if(liveLandmarks){
+   const P=liveLandmarks.map(p=>[(1-p.x)*720,p.y*520]);
+   const connections=window.FACEMESH_TESSELATION||[];
+   ctx.save();ctx.lineWidth=.55;ctx.shadowColor=accent;ctx.shadowBlur=glow*.18;
+   ctx.strokeStyle='rgba('+R+','+G+','+B+','+(alpha*.34)+')';
+   for(const edge of connections){const a=P[edge[0]],b=P[edge[1]];if(!a||!b)continue;ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.stroke()}
+   const lips=[61,146,91,181,84,17,314,405,321,375,291,308,324,318,402,317,14,87,178,88,95,78,191,80,81,82];
+   ctx.beginPath();lips.forEach((id,i)=>{const p=P[id];if(!p)return;if(i===0)ctx.moveTo(p[0],p[1]);else ctx.lineTo(p[0],p[1])});ctx.closePath();
+   ctx.strokeStyle='#ff75c8';ctx.lineWidth=2.2;ctx.shadowColor='#ff75c8';ctx.shadowBlur=12;ctx.stroke();
+   // Inner lip line makes mouth opening and speech motion visible
+   const inner=[78,191,80,81,82,13,312,311,310,415,308];
+   ctx.beginPath();inner.forEach((id,i)=>{const p=P[id];if(!p)return;if(i===0)ctx.moveTo(p[0],p[1]);else ctx.lineTo(p[0],p[1])});
+   ctx.strokeStyle='#fff0fa';ctx.lineWidth=1.4;ctx.stroke();ctx.restore();
+ }
  // central facial axis and corner particles
  ctx.setLineDash([2,7]);ctx.strokeStyle='rgba('+R+','+G+','+B+','+(.17*alpha)+')';ctx.beginPath();ctx.moveTo(360,65);ctx.lineTo(360,454);ctx.stroke();ctx.setLineDash([]);
  ctx.restore();raf=requestAnimationFrame(draw)}
@@ -105,18 +121,20 @@ document.querySelectorAll('.swatch').forEach(b=>b.addEventListener('click',()=>{
 $('pause').addEventListener('click',()=>{paused=!paused;$('pause').textContent=paused?'Resume':'Pause';if(!paused)requestAnimationFrame(draw)});
 $('capture').addEventListener('click',()=>{const a=document.createElement('a');a.download='neo-mesh-face.png';a.href=c.toDataURL('image/png');a.click()});
 
-let cameraStream=null,videoRecorder=null,audioRecorder=null,videoChunks=[],audioChunks=[],videoBlob=null,audioBlob=null;
+let cameraStream=null,videoRecorder=null,audioRecorder=null,videoChunks=[],audioChunks=[],videoBlob=null,audioBlob=null,faceMesh=null,liveLandmarks=null,tracking=false,faceLoopBusy=false;
 const status=$('recStatus'),preview=$('cameraPreview');
-async function openCamera(){try{cameraStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user'},audio:true});preview.srcObject=cameraStream;status.textContent='CAMERA READY'}catch(e){status.textContent='PERMISSION DENIED';alert('Could not open camera/microphone. Allow access and use HTTPS or localhost. '+e.message)}}
+async function openCamera(){try{cameraStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user'},audio:true});preview.srcObject=cameraStream;await preview.play();status.textContent='CAMERA READY'}catch(e){status.textContent='PERMISSION DENIED';alert('Could not open camera/microphone. Allow access and use HTTPS or localhost. '+e.message)}}
+async function startFaceTracking(){if(!cameraStream)await openCamera();if(!cameraStream)return;if(!window.FaceMesh){alert('Face tracking library did not load. Check your internet connection and refresh.');return}try{if(!faceMesh){faceMesh=new FaceMesh({locateFile:file=>'https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/'+file});faceMesh.setOptions({maxNumFaces:1,refineLandmarks:true,minDetectionConfidence:.55,minTrackingConfidence:.55});faceMesh.onResults(results=>{liveLandmarks=results.multiFaceLandmarks&&results.multiFaceLandmarks[0]?results.multiFaceLandmarks[0]:null;status.textContent=liveLandmarks?'LIVE FACE + LIPS':'SEARCHING FOR FACE'})}tracking=true;$('trackFace').textContent='Stop live face mesh';$('trackFace').classList.add('active');status.textContent='FINDING FACE';const tick=async()=>{if(!tracking||!cameraStream)return;if(!faceLoopBusy&&preview.readyState>=2){faceLoopBusy=true;try{await faceMesh.send({image:preview})}catch(e){}faceLoopBusy=false}if(tracking)requestAnimationFrame(tick)};tick()}catch(e){alert('Could not start face tracking: '+e.message)}}
+function stopFaceTracking(){tracking=false;liveLandmarks=null;$('trackFace').textContent='Start live face mesh';$('trackFace').classList.remove('active');status.textContent=cameraStream?'CAMERA READY':'CAMERA OFF'}
 function closeCamera(){if(cameraStream){cameraStream.getTracks().forEach(track=>track.stop());cameraStream=null;preview.srcObject=null;status.textContent='CAMERA OFF'}}
-$('cameraOn').addEventListener('click',openCamera);$('cameraOff').addEventListener('click',closeCamera);
+$('cameraOn').addEventListener('click',openCamera);$('trackFace').addEventListener('click',()=>tracking?stopFaceTracking():startFaceTracking());$('cameraOff').addEventListener('click',()=>{stopFaceTracking();closeCamera()});
 $('recordVideo').addEventListener('click',async()=>{if(!cameraStream)await openCamera();if(!cameraStream)return;try{videoChunks=[];videoRecorder=new MediaRecorder(cameraStream);videoRecorder.ondataavailable=e=>{if(e.data.size)videoChunks.push(e.data)};videoRecorder.onstop=()=>{videoBlob=new Blob(videoChunks,{type:videoRecorder.mimeType||'video/webm'});$('downloadVideo').disabled=false;status.textContent='VIDEO READY'};videoRecorder.start();$('recordVideo').disabled=true;$('stopVideo').disabled=false;status.textContent='RECORDING VIDEO'}catch(e){alert('Video recording is not supported in this browser: '+e.message)}});
 $('stopVideo').addEventListener('click',()=>{if(videoRecorder&&videoRecorder.state!=='inactive'){videoRecorder.stop();$('recordVideo').disabled=false;$('stopVideo').disabled=true}});
 $('downloadVideo').addEventListener('click',()=>{if(!videoBlob)return;const a=document.createElement('a');a.href=URL.createObjectURL(videoBlob);a.download='neo-mesh-camera-recording.webm';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)});
 $('recordAudio').addEventListener('click',async()=>{if(!cameraStream)await openCamera();if(!cameraStream)return;try{audioChunks=[];audioRecorder=new MediaRecorder(new MediaStream(cameraStream.getAudioTracks()));audioRecorder.ondataavailable=e=>{if(e.data.size)audioChunks.push(e.data)};audioRecorder.onstop=()=>{audioBlob=new Blob(audioChunks,{type:audioRecorder.mimeType||'audio/webm'});$('downloadAudio').disabled=false;status.textContent='AUDIO READY'};audioRecorder.start();$('recordAudio').disabled=true;$('stopAudio').disabled=false;status.textContent='RECORDING AUDIO'}catch(e){alert('Audio recording is not supported in this browser: '+e.message)}});
 $('stopAudio').addEventListener('click',()=>{if(audioRecorder&&audioRecorder.state!=='inactive'){audioRecorder.stop();$('recordAudio').disabled=false;$('stopAudio').disabled=true}});
 $('downloadAudio').addEventListener('click',()=>{if(!audioBlob)return;const a=document.createElement('a');a.href=URL.createObjectURL(audioBlob);a.download='neo-mesh-audio-recording.webm';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)});
-window.addEventListener('pagehide',closeCamera);
+window.addEventListener('pagehide',()=>{stopFaceTracking();closeCamera()});
 
 draw(0);
 })();
