@@ -63,13 +63,13 @@ footer{max-width:1180px;margin:0 auto;padding:0 22px 30px;color:#61718f;font-siz
 <button class="btn secondary" id="cameraOn">Open camera</button><button class="btn primary" id="trackFace">Start hacker mask</button><button class="btn secondary" id="cameraOff">Close camera</button>
 </div>
 <div class="actions" style="flex-wrap:wrap;margin-top:9px">
-<button class="btn primary" id="recordVideo">● Record video</button><button class="btn secondary" id="stopVideo" disabled>Stop</button>
+<div class="rec-clock" id="cameraClock"><i class="rec-light"></i><span id="cameraClockLabel">READY TO RECORD</span><strong id="cameraTimer">00:00</strong></div>\n<button class="btn primary" id="recordVideo">● Record video</button><button class="btn secondary" id="stopVideo" disabled>Stop</button>
 </div>
 <div class="actions" style="flex-wrap:wrap;margin-top:9px">
 <button class="btn secondary" id="downloadVideo" disabled>↓ Download camera video</button>
 </div>
 <div class="actions" style="flex-wrap:wrap;margin-top:15px">
-<button class="btn primary" id="screenRecord">▣ Record screen</button><button class="btn secondary" id="screenStop" disabled>Stop screen</button>
+<div class="rec-clock" id="screenClock"><i class="rec-light"></i><span id="screenClockLabel">SCREEN READY</span><strong id="screenTimer">00:00</strong></div>\n<button class="btn primary" id="screenRecord">▣ Record screen</button><button class="btn secondary" id="screenStop" disabled>Stop screen</button>
 </div>
 <div class="actions" style="flex-wrap:wrap;margin-top:9px">
 <button class="btn secondary" id="screenDownload" disabled>↓ Download screen video</button>
